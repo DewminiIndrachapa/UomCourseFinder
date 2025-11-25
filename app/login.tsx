@@ -5,18 +5,18 @@ import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function LoginScreen() {
@@ -28,10 +28,10 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
 
   const validateForm = () => {
-    const newErrors: { email?: string; password?: string } = {};
+    const newErrors: { email?: string; password?: string; general?: string } = {};
 
     // Email validation
     if (!email.trim()) {
@@ -52,6 +52,9 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
+    // Clear previous general error
+    setErrors(prev => ({ ...prev, general: undefined }));
+    
     if (!validateForm()) return;
 
     setLoading(true);
@@ -61,7 +64,12 @@ export default function LoginScreen() {
     if (result.success) {
       // Navigation will be handled by root layout
     } else {
-      Alert.alert('Login Failed', result.error || 'Please check your credentials');
+      // Show inline error message
+      const errorMessage = result.error || 'Invalid email or password. Please try again.';
+      setErrors(prev => ({ ...prev, general: errorMessage }));
+      
+      // Also show alert
+      Alert.alert('Login Failed', errorMessage);
     }
   };
 
@@ -178,6 +186,14 @@ export default function LoginScreen() {
                 <Text style={styles.errorText}>{errors.password}</Text>
               )}
             </View>
+
+            {/* General Error Message (for incorrect credentials) */}
+            {errors.general && (
+              <View style={[styles.generalErrorContainer, { backgroundColor: '#FFEBEE', borderColor: '#E74C3C' }]}>
+                <Feather name="alert-circle" size={20} color="#E74C3C" />
+                <Text style={styles.generalErrorText}>{errors.general}</Text>
+              </View>
+            )}
 
             {/* Login Button */}
             <TouchableOpacity
@@ -300,6 +316,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
+  },
+  generalErrorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 16,
+    gap: 10,
+  },
+  generalErrorText: {
+    color: '#E74C3C',
+    fontSize: 14,
+    flex: 1,
+    fontWeight: '500',
   },
   loginButton: {
     backgroundColor: '#007AFF',
