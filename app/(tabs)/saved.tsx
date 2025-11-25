@@ -1,10 +1,10 @@
 import CourseCard from '@/components/CourseCard';
 import EventCard from '@/components/EventCard';
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { DataService } from '@/services/DataService';
 import { Course, Event } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 
 export default function SavedScreen() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const router = useRouter();
   const [savedCourses, setSavedCourses] = useState<Course[]>([]);
   const [savedEvents, setSavedEvents] = useState<Event[]>([]);
@@ -77,15 +77,6 @@ export default function SavedScreen() {
         barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={Colors[colorScheme ?? 'light'].background}
       />
-
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
-          Saved
-        </Text>
-        <Text style={[styles.subtitle, { color: Colors[colorScheme ?? 'light'].tabIconDefault }]}>
-          Your bookmarked courses and events
-        </Text>
-      </View>
 
       {/* Tab Selector */}
       <View style={styles.tabContainer}>
@@ -159,8 +150,8 @@ export default function SavedScreen() {
             ))
           ) : (
             <View style={styles.emptyState}>
-              <Ionicons
-                name="bookmark-outline"
+              <Feather
+                name="bookmark"
                 size={64}
                 color={Colors[colorScheme ?? 'light'].tabIconDefault}
               />
@@ -188,8 +179,8 @@ export default function SavedScreen() {
           ))
         ) : (
           <View style={styles.emptyState}>
-            <Ionicons
-              name="bookmark-outline"
+            <Feather
+              name="bookmark"
               size={64}
               color={Colors[colorScheme ?? 'light'].tabIconDefault}
             />

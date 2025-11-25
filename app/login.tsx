@@ -1,10 +1,11 @@
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     KeyboardAvoidingView,
     Platform,
@@ -19,7 +20,7 @@ import {
 } from 'react-native';
 
 export default function LoginScreen() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const router = useRouter();
   const { login } = useAuth();
   
@@ -84,8 +85,8 @@ export default function LoginScreen() {
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <Ionicons
-                name="school"
+              <Feather
+                name="book"
                 size={60}
                 color={Colors[colorScheme ?? 'light'].tint}
               />
@@ -112,8 +113,8 @@ export default function LoginScreen() {
                   errors.email && styles.inputError,
                 ]}
               >
-                <Ionicons
-                  name="mail-outline"
+                <Feather
+                  name="mail"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
                 />
@@ -148,8 +149,8 @@ export default function LoginScreen() {
                   errors.password && styles.inputError,
                 ]}
               >
-                <Ionicons
-                  name="lock-closed-outline"
+                <Feather
+                  name="lock"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
                 />
@@ -166,8 +167,8 @@ export default function LoginScreen() {
                   autoCapitalize="none"
                 />
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <Ionicons
-                    name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                  <Feather
+                    name={showPassword ? 'eye' : 'eye-off'}
                     size={20}
                     color={Colors[colorScheme ?? 'light'].tabIconDefault}
                   />
@@ -182,15 +183,16 @@ export default function LoginScreen() {
             <TouchableOpacity
               style={[
                 styles.loginButton,
-                { backgroundColor: Colors[colorScheme ?? 'light'].tint },
                 loading && styles.loginButtonDisabled,
               ]}
               onPress={handleLogin}
               disabled={loading}
             >
-              <Text style={styles.loginButtonText}>
-                {loading ? 'Signing In...' : 'Sign In'}
-              </Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.loginButtonText}>Sign In</Text>
+              )}
             </TouchableOpacity>
 
             {/* Divider */}
@@ -300,10 +302,17 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   loginButton: {
+    backgroundColor: '#007AFF',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   loginButtonDisabled: {
     opacity: 0.6,

@@ -1,8 +1,8 @@
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { DataService } from '@/services/DataService';
 import { Course, Event } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 
 export default function ModalScreen() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const router = useRouter();
   const params = useLocalSearchParams();
   const { id, type } = params;
@@ -111,15 +111,15 @@ export default function ModalScreen() {
         ]}
       >
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons
-            name="close"
+          <Feather
+            name="x"
             size={28}
             color={Colors[colorScheme ?? 'light'].text}
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleSaveToggle} style={styles.saveButton}>
-          <Ionicons
-            name={isSaved ? 'bookmark' : 'bookmark-outline'}
+          <Feather
+            name="bookmark"
             size={28}
             color={isSaved ? '#4A90E2' : Colors[colorScheme ?? 'light'].text}
           />
@@ -147,7 +147,7 @@ export default function ModalScreen() {
                   <Text style={styles.levelText}>{courseData.level}</Text>
                 </View>
                 <View style={styles.ratingContainer}>
-                  <Ionicons name="star" size={18} color="#F39C12" />
+                  <Feather name="star" size={18} color="#F39C12" />
                   <Text style={[styles.rating, { color: Colors[colorScheme ?? 'light'].text }]}>
                     {courseData.rating} ({courseData.enrolledCount} enrolled)
                   </Text>
@@ -155,8 +155,8 @@ export default function ModalScreen() {
               </View>
 
               <View style={styles.instructorRow}>
-                <Ionicons
-                  name="person-circle-outline"
+                <Feather
+                  name="user"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tint}
                 />
@@ -177,8 +177,8 @@ export default function ModalScreen() {
 
               <View style={styles.eventInfoContainer}>
                 <View style={styles.eventInfoRow}>
-                  <Ionicons
-                    name="calendar-outline"
+                  <Feather
+                    name="calendar"
                     size={20}
                     color={Colors[colorScheme ?? 'light'].tint}
                   />
@@ -187,8 +187,8 @@ export default function ModalScreen() {
                   </Text>
                 </View>
                 <View style={styles.eventInfoRow}>
-                  <Ionicons
-                    name="time-outline"
+                  <Feather
+                    name="clock"
                     size={20}
                     color={Colors[colorScheme ?? 'light'].tint}
                   />
@@ -197,8 +197,8 @@ export default function ModalScreen() {
                   </Text>
                 </View>
                 <View style={styles.eventInfoRow}>
-                  <Ionicons
-                    name={eventData.isOnline ? 'videocam-outline' : 'location-outline'}
+                  <Feather
+                    name={eventData.isOnline ? 'video' : 'map-pin'}
                     size={20}
                     color={Colors[colorScheme ?? 'light'].tint}
                   />
@@ -207,8 +207,8 @@ export default function ModalScreen() {
                   </Text>
                 </View>
                 <View style={styles.eventInfoRow}>
-                  <Ionicons
-                    name="people-outline"
+                  <Feather
+                    name="users"
                     size={20}
                     color={Colors[colorScheme ?? 'light'].tint}
                   />

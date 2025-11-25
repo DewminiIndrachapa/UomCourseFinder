@@ -1,8 +1,8 @@
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { DataService } from '@/services/DataService';
 import { Event } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -13,7 +13,7 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event, onPress, onSaveToggle }: EventCardProps) {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
@@ -75,10 +75,11 @@ export default function EventCard({ event, onPress, onSaveToggle }: EventCardPro
             {event.title}
           </Text>
           <TouchableOpacity onPress={handleSaveToggle} style={styles.saveButton}>
-            <Ionicons
-              name={isSaved ? 'bookmark' : 'bookmark-outline'}
+            <Feather
+              name="bookmark"
               size={24}
               color={isSaved ? '#4A90E2' : Colors[colorScheme ?? 'light'].icon}
+              fill={isSaved ? '#4A90E2' : 'none'}
             />
           </TouchableOpacity>
         </View>
@@ -99,8 +100,8 @@ export default function EventCard({ event, onPress, onSaveToggle }: EventCardPro
 
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
-            <Ionicons 
-              name="calendar-outline" 
+            <Feather 
+              name="calendar" 
               size={16} 
               color={Colors[colorScheme ?? 'light'].tint} 
             />
@@ -109,8 +110,8 @@ export default function EventCard({ event, onPress, onSaveToggle }: EventCardPro
             </Text>
           </View>
           <View style={styles.infoItem}>
-            <Ionicons 
-              name="time-outline" 
+            <Feather 
+              name="clock" 
               size={16} 
               color={Colors[colorScheme ?? 'light'].tint} 
             />
@@ -122,8 +123,8 @@ export default function EventCard({ event, onPress, onSaveToggle }: EventCardPro
 
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
-            <Ionicons 
-              name={event.isOnline ? 'videocam-outline' : 'location-outline'} 
+            <Feather 
+              name={event.isOnline ? 'video' : 'map-pin'} 
               size={16} 
               color={Colors[colorScheme ?? 'light'].tint} 
             />

@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -31,7 +31,7 @@ const FACULTIES = [
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Postgraduate'];
 
 export default function RegisterScreen() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const router = useRouter();
   const { register } = useAuth();
 
@@ -54,7 +54,11 @@ export default function RegisterScreen() {
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: undefined }));
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      return newErrors;
+    });
   };
 
   const validateForm = () => {
@@ -135,8 +139,8 @@ export default function RegisterScreen() {
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-              <Ionicons
-                name="arrow-back"
+              <Feather
+                name="arrow-left"
                 size={24}
                 color={Colors[colorScheme ?? 'light'].text}
               />
@@ -163,8 +167,8 @@ export default function RegisterScreen() {
                   errors.name && styles.inputError,
                 ]}
               >
-                <Ionicons
-                  name="person-outline"
+                <Feather
+                  name="user"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
                 />
@@ -192,8 +196,8 @@ export default function RegisterScreen() {
                   errors.email && styles.inputError,
                 ]}
               >
-                <Ionicons
-                  name="mail-outline"
+                <Feather
+                  name="mail"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
                 />
@@ -222,8 +226,8 @@ export default function RegisterScreen() {
                   errors.studentId && styles.inputError,
                 ]}
               >
-                <Ionicons
-                  name="card-outline"
+                <Feather
+                  name="credit-card"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
                 />
@@ -253,8 +257,8 @@ export default function RegisterScreen() {
                 ]}
                 onPress={() => setShowFacultyPicker(!showFacultyPicker)}
               >
-                <Ionicons
-                  name="business-outline"
+                <Feather
+                  name="briefcase"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
                 />
@@ -266,7 +270,7 @@ export default function RegisterScreen() {
                 >
                   {formData.faculty || 'Select your faculty'}
                 </Text>
-                <Ionicons
+                <Feather
                   name="chevron-down"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
@@ -275,7 +279,10 @@ export default function RegisterScreen() {
               {errors.faculty && <Text style={styles.errorText}>{errors.faculty}</Text>}
               
               {showFacultyPicker && (
-                <View style={[styles.picker, { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground }]}>
+                <ScrollView 
+                  style={[styles.picker, { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground }]}
+                  nestedScrollEnabled={true}
+                >
                   {FACULTIES.map((faculty) => (
                     <TouchableOpacity
                       key={faculty}
@@ -290,7 +297,7 @@ export default function RegisterScreen() {
                       </Text>
                     </TouchableOpacity>
                   ))}
-                </View>
+                </ScrollView>
               )}
             </View>
 
@@ -307,8 +314,8 @@ export default function RegisterScreen() {
                 ]}
                 onPress={() => setShowYearPicker(!showYearPicker)}
               >
-                <Ionicons
-                  name="calendar-outline"
+                <Feather
+                  name="calendar"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
                 />
@@ -320,7 +327,7 @@ export default function RegisterScreen() {
                 >
                   {formData.year || 'Select your year'}
                 </Text>
-                <Ionicons
+                <Feather
                   name="chevron-down"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
@@ -329,7 +336,10 @@ export default function RegisterScreen() {
               {errors.year && <Text style={styles.errorText}>{errors.year}</Text>}
               
               {showYearPicker && (
-                <View style={[styles.picker, { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground }]}>
+                <ScrollView 
+                  style={[styles.picker, { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground }]}
+                  nestedScrollEnabled={true}
+                >
                   {YEARS.map((year) => (
                     <TouchableOpacity
                       key={year}
@@ -344,7 +354,7 @@ export default function RegisterScreen() {
                       </Text>
                     </TouchableOpacity>
                   ))}
-                </View>
+                </ScrollView>
               )}
             </View>
 
@@ -360,8 +370,8 @@ export default function RegisterScreen() {
                   errors.password && styles.inputError,
                 ]}
               >
-                <Ionicons
-                  name="lock-closed-outline"
+                <Feather
+                  name="lock"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
                 />
@@ -375,8 +385,8 @@ export default function RegisterScreen() {
                   autoCapitalize="none"
                 />
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <Ionicons
-                    name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                  <Feather
+                    name={showPassword ? 'eye' : 'eye-off'}
                     size={20}
                     color={Colors[colorScheme ?? 'light'].tabIconDefault}
                   />
@@ -397,8 +407,8 @@ export default function RegisterScreen() {
                   errors.confirmPassword && styles.inputError,
                 ]}
               >
-                <Ionicons
-                  name="lock-closed-outline"
+                <Feather
+                  name="lock"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
                 />
@@ -412,8 +422,8 @@ export default function RegisterScreen() {
                   autoCapitalize="none"
                 />
                 <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  <Ionicons
-                    name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}
+                  <Feather
+                    name={showConfirmPassword ? 'eye' : 'eye-off'}
                     size={20}
                     color={Colors[colorScheme ?? 'light'].tabIconDefault}
                   />

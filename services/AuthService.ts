@@ -1,4 +1,5 @@
 import { LoginCredentials, RegisterData, User } from '@/types/auth';
+import { SecureStorage } from '@/utils/SecureStorage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ApiService from './ApiService';
 
@@ -10,8 +11,8 @@ export class AuthService {
   // Get current user
   static async getCurrentUser(): Promise<User | null> {
     try {
-      const userJson = await AsyncStorage.getItem(AUTH_KEY);
-      return userJson ? JSON.parse(userJson) : null;
+      const user = await SecureStorage.getUser();
+      return user;
     } catch (error) {
       console.error('Error getting current user:', error);
       return null;
@@ -46,7 +47,8 @@ export class AuthService {
           createdAt: new Date().toISOString(),
         };
 
-        await AsyncStorage.setItem(AUTH_KEY, JSON.stringify(user));
+        await SecureStorage.saveUser(user);
+        await SecureStorage.saveAuthToken(data.token);
         console.log('✅ Login successful via DummyJSON API');
         return { success: true, user };
       }
@@ -80,7 +82,7 @@ export class AuthService {
         return { success: false, error: 'Invalid email or password' };
       }
 
-      await AsyncStorage.setItem(AUTH_KEY, JSON.stringify(user));
+      await SecureStorage.saveUser(user);
       console.log('✅ Login successful via local storage');
       return { success: true, user };
     } catch (error) {
@@ -124,7 +126,7 @@ export class AuthService {
 
         // Save to local storage as well
         await this.saveUserLocally(user);
-        await AsyncStorage.setItem(AUTH_KEY, JSON.stringify(user));
+        await SecureStorage.saveUser(user);
 
         console.log('✅ Registration successful via DummyJSON API');
         return { success: true, user };
@@ -168,7 +170,7 @@ export class AuthService {
 
       users.push(newUser);
       await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
-      await AsyncStorage.setItem(AUTH_KEY, JSON.stringify(newUser));
+      await SecureStorage.saveUser(newUser);
 
       console.log('✅ Registration successful via local storage');
       return { success: true, user: newUser };
@@ -199,7 +201,7 @@ export class AuthService {
   // Logout
   static async logout(): Promise<void> {
     try {
-      await AsyncStorage.removeItem(AUTH_KEY);
+      await SecureStorage.clearAll();
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -219,7 +221,7 @@ export class AuthService {
       }
 
       // Update current user
-      await AsyncStorage.setItem(AUTH_KEY, JSON.stringify(user));
+      await SecureStorage.saveUser(user);
       return { success: true };
     } catch (error) {
       console.error('Update profile error:', error);

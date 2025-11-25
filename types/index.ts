@@ -1,3 +1,14 @@
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  studentId: string;
+  faculty: string;
+  year: string;
+  avatar?: string;
+  createdAt: string;
+}
+
 export interface Course {
   id: string;
   title: string;
