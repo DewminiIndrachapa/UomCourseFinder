@@ -3,6 +3,9 @@ import EventCard from '@/components/EventCard';
 import { Colors } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { DataService } from '@/services/DataService';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setCoursesLoading, setCoursesSuccess } from '@/store/slices/coursesSlice';
+import { setEventsLoading, setEventsSuccess } from '@/store/slices/eventsSlice';
 import { Course, Event } from '@/types';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -22,45 +25,50 @@ import {
 export default function HomeScreen() {
   const { colorScheme } = useTheme();
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  
+  // Redux state
+  const coursesFromRedux = useAppSelector((state) => state.courses.items);
+  const eventsFromRedux = useAppSelector((state) => state.events.items);
+  const coursesLoading = useAppSelector((state) => state.courses.loading);
+  const eventsLoading = useAppSelector((state) => state.events.loading);
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'courses' | 'events'>('courses');
   const [refreshKey, setRefreshKey] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [allCourses, setAllCourses] = useState<Course[]>([]);
-  const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
 
-  // Load data from API
+  // Load data from API and store in Redux
   useEffect(() => {
     loadData();
   }, [refreshKey]);
 
-  // Update filtered data when search changes
+  // Update filtered data when search changes or Redux state updates
   useEffect(() => {
     if (searchQuery) {
       searchData();
     } else {
-      setFilteredCourses(allCourses);
-      setFilteredEvents(allEvents);
+      setFilteredCourses(coursesFromRedux);
+      setFilteredEvents(eventsFromRedux);
     }
-  }, [searchQuery, allCourses, allEvents]);
+  }, [searchQuery, coursesFromRedux, eventsFromRedux]);
 
   const loadData = async () => {
-    setLoading(true);
+    dispatch(setCoursesLoading(true));
+    dispatch(setCoursesLoading(true));
+    dispatch(setEventsLoading(true));
     try {
       const [courses, events] = await Promise.all([
         DataService.getCourses(),
         DataService.getEvents(),
       ]);
-      setAllCourses(courses);
-      setAllEvents(events);
+      dispatch(setCoursesSuccess(courses));
+      dispatch(setEventsSuccess(events));
       setFilteredCourses(courses);
       setFilteredEvents(events);
     } catch (error) {
       console.error('Error loading data:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -75,17 +83,13 @@ export default function HomeScreen() {
   };
 
   const handleCoursePress = (course: Course) => {
-    router.push({
-      pathname: '/modal',
-      params: { id: course.id, type: 'course' },
-    });
+    console.log('Course pressed:', course.id, course.title);
+    router.push(`/modal?id=${course.id}&type=course`);
   };
 
   const handleEventPress = (event: Event) => {
-    router.push({
-      pathname: '/modal',
-      params: { id: event.id, type: 'event' },
-    });
+    console.log('Event pressed:', event.id, event.title);
+    router.push(`/modal?id=${event.id}&type=event`);
   };
 
   const handleRefresh = async () => {
@@ -93,7 +97,9 @@ export default function HomeScreen() {
     setRefreshKey(prev => prev + 1);
   };
 
-  if (loading) {
+  const loading = coursesLoading || eventsLoading;
+
+  if (loading && coursesFromRedux.length === 0) {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}

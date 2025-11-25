@@ -71,22 +71,22 @@ export default function CourseCard({ course, onPress, onSaveToggle }: CourseCard
           >
             {course.title}
           </Text>
-          <TouchableOpacity onPress={handleSaveToggle} style={styles.saveButton}>
+          <TouchableOpacity 
+            onPress={(e) => {
+              e.stopPropagation();
+              handleSaveToggle();
+            }} 
+            style={styles.bookmarkButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
             <Feather
               name="bookmark"
               size={24}
-              color={isSaved ? '#4A90E2' : Colors[colorScheme ?? 'light'].icon}
-              fill={isSaved ? '#4A90E2' : 'none'}
+              color={isSaved ? Colors[colorScheme ?? 'light'].tint : Colors[colorScheme ?? 'light'].tabIconDefault}
+              fill={isSaved ? Colors[colorScheme ?? 'light'].tint : 'transparent'}
             />
           </TouchableOpacity>
         </View>
-
-        <Text 
-          style={[styles.instructor, { color: Colors[colorScheme ?? 'light'].tabIconDefault }]} 
-          numberOfLines={1}
-        >
-          {course.instructor}
-        </Text>
 
         <Text 
           style={[styles.description, { color: Colors[colorScheme ?? 'light'].tabIconDefault }]} 
@@ -95,42 +95,8 @@ export default function CourseCard({ course, onPress, onSaveToggle }: CourseCard
           {course.description}
         </Text>
 
-        <View style={styles.footer}>
-          <View style={styles.leftFooter}>
-            <View style={[styles.levelBadge, { backgroundColor: getLevelColor(course.level) }]}>
-              <Text style={styles.levelText}>{course.level}</Text>
-            </View>
-            <View style={styles.ratingContainer}>
-              <Feather name="star" size={16} color="#F39C12" fill="#F39C12" />
-              <Text style={[styles.rating, { color: Colors[colorScheme ?? 'light'].text }]}>
-                {course.rating}
-              </Text>
-            </View>
-          </View>
-          
-          <View style={styles.metaContainer}>
-            <Feather 
-              name="clock" 
-              size={14} 
-              color={Colors[colorScheme ?? 'light'].tabIconDefault} 
-            />
-            <Text style={[styles.metaText, { color: Colors[colorScheme ?? 'light'].tabIconDefault }]}>
-              {course.duration}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.tagsContainer}>
-          {course.tags && course.tags.length > 0 && course.tags.slice(0, 3).map((tag, index) => (
-            <View 
-              key={index} 
-              style={[styles.tag, { backgroundColor: Colors[colorScheme ?? 'light'].tint + '20' }]}
-            >
-              <Text style={[styles.tagText, { color: Colors[colorScheme ?? 'light'].tint }]}>
-                {tag}
-              </Text>
-            </View>
-          ))}
+        <View style={[styles.statusBadge, { backgroundColor: getLevelColor(course.level) }]}>
+          <Text style={styles.statusText}>{course.level}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -160,7 +126,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   title: {
     fontSize: 18,
@@ -168,68 +134,23 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
   },
-  saveButton: {
+  bookmarkButton: {
     padding: 4,
-  },
-  instructor: {
-    fontSize: 14,
-    marginBottom: 8,
   },
   description: {
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 12,
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  leftFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  levelBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  statusBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 12,
   },
-  levelText: {
+  statusText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  rating: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  metaContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  metaText: {
-    fontSize: 12,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  tag: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  tagText: {
-    fontSize: 11,
-    fontWeight: '500',
   },
 });

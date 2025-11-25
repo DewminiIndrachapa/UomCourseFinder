@@ -30,12 +30,12 @@ export default function ModalScreen() {
     checkSavedStatus();
   }, [id, type]);
 
-  const loadContent = () => {
+  const loadContent = async () => {
     if (type === 'course') {
-      const course = DataService.getCourseById(id as string);
+      const course = await DataService.getCourseById(id as string);
       setContent(course || null);
     } else if (type === 'event') {
-      const event = DataService.getEventById(id as string);
+      const event = await DataService.getEventById(id as string);
       setContent(event || null);
     }
   };
@@ -284,26 +284,28 @@ export default function ModalScreen() {
           )}
 
           {/* Tags */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: Colors[colorScheme ?? 'light'].text }]}>
-              Tags
-            </Text>
-            <View style={styles.tagsContainer}>
-              {content.tags.map((tag, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.tag,
-                    { backgroundColor: Colors[colorScheme ?? 'light'].tint + '20' },
-                  ]}
-                >
-                  <Text style={[styles.tagText, { color: Colors[colorScheme ?? 'light'].tint }]}>
-                    {tag}
-                  </Text>
-                </View>
-              ))}
+          {content.tags && content.tags.length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: Colors[colorScheme ?? 'light'].text }]}>
+                Tags
+              </Text>
+              <View style={styles.tagsContainer}>
+                {content.tags.map((tag, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.tag,
+                      { backgroundColor: Colors[colorScheme ?? 'light'].tint + '20' },
+                    ]}
+                  >
+                    <Text style={[styles.tagText, { color: Colors[colorScheme ?? 'light'].tint }]}>
+                      {tag}
+                    </Text>
+                  </View>
+                ))}
+              </View>
             </View>
-          </View>
+          )}
         </View>
       </ScrollView>
 

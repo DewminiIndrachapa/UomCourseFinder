@@ -74,22 +74,22 @@ export default function EventCard({ event, onPress, onSaveToggle }: EventCardPro
           >
             {event.title}
           </Text>
-          <TouchableOpacity onPress={handleSaveToggle} style={styles.saveButton}>
+          <TouchableOpacity 
+            onPress={(e) => {
+              e.stopPropagation();
+              handleSaveToggle();
+            }} 
+            style={styles.bookmarkButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
             <Feather
               name="bookmark"
               size={24}
-              color={isSaved ? '#4A90E2' : Colors[colorScheme ?? 'light'].icon}
-              fill={isSaved ? '#4A90E2' : 'none'}
+              color={isSaved ? Colors[colorScheme ?? 'light'].tint : Colors[colorScheme ?? 'light'].tabIconDefault}
+              fill={isSaved ? Colors[colorScheme ?? 'light'].tint : 'transparent'}
             />
           </TouchableOpacity>
         </View>
-
-        <Text 
-          style={[styles.organizer, { color: Colors[colorScheme ?? 'light'].tabIconDefault }]} 
-          numberOfLines={1}
-        >
-          Organized by {event.organizer}
-        </Text>
 
         <Text 
           style={[styles.description, { color: Colors[colorScheme ?? 'light'].tabIconDefault }]} 
@@ -98,65 +98,10 @@ export default function EventCard({ event, onPress, onSaveToggle }: EventCardPro
           {event.description}
         </Text>
 
-        <View style={styles.infoRow}>
-          <View style={styles.infoItem}>
-            <Feather 
-              name="calendar" 
-              size={16} 
-              color={Colors[colorScheme ?? 'light'].tint} 
-            />
-            <Text style={[styles.infoText, { color: Colors[colorScheme ?? 'light'].text }]}>
-              {formatDate(event.date)}
-            </Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Feather 
-              name="clock" 
-              size={16} 
-              color={Colors[colorScheme ?? 'light'].tint} 
-            />
-            <Text style={[styles.infoText, { color: Colors[colorScheme ?? 'light'].text }]}>
-              {event.time}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.infoRow}>
-          <View style={styles.infoItem}>
-            <Feather 
-              name={event.isOnline ? 'video' : 'map-pin'} 
-              size={16} 
-              color={Colors[colorScheme ?? 'light'].tint} 
-            />
-            <Text 
-              style={[styles.infoText, { color: Colors[colorScheme ?? 'light'].text }]} 
-              numberOfLines={1}
-            >
-              {event.location}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.footer}>
-          <View style={styles.availabilityContainer}>
-            <View style={[styles.availabilityDot, { backgroundColor: getAvailabilityColor() }]} />
-            <Text style={[styles.availabilityText, { color: Colors[colorScheme ?? 'light'].text }]}>
-              {availableSpots} spots left
-            </Text>
-          </View>
-
-          <View style={styles.tagsContainer}>
-            {event.tags && event.tags.length > 0 && event.tags.slice(0, 2).map((tag, index) => (
-              <View 
-                key={index} 
-                style={[styles.tag, { backgroundColor: Colors[colorScheme ?? 'light'].tint + '20' }]}
-              >
-                <Text style={[styles.tagText, { color: Colors[colorScheme ?? 'light'].tint }]}>
-                  {tag}
-                </Text>
-              </View>
-            ))}
-          </View>
+        <View style={[styles.statusBadge, { backgroundColor: getAvailabilityColor() }]}>
+          <Text style={styles.statusText}>
+            {availableSpots > 0 ? `${availableSpots} spots available` : 'Fully Booked'}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -186,7 +131,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   title: {
     fontSize: 18,
@@ -194,70 +139,23 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
   },
-  saveButton: {
+  bookmarkButton: {
     padding: 4,
-  },
-  organizer: {
-    fontSize: 13,
-    marginBottom: 8,
-    fontStyle: 'italic',
   },
   description: {
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 12,
   },
-  infoRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    marginBottom: 8,
+  statusBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    flex: 1,
-    minWidth: '45%',
-  },
-  infoText: {
-    fontSize: 13,
-    flex: 1,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#E1E8ED',
-  },
-  availabilityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  availabilityDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  availabilityText: {
-    fontSize: 13,
+  statusText: {
+    color: '#fff',
+    fontSize: 12,
     fontWeight: '600',
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  tag: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  tagText: {
-    fontSize: 11,
-    fontWeight: '500',
   },
 });
