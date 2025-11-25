@@ -120,7 +120,7 @@ export default function CourseCard({ course, onPress, onSaveToggle }: CourseCard
         </View>
 
         <View style={styles.tagsContainer}>
-          {course.tags.slice(0, 3).map((tag, index) => (
+          {course.tags && course.tags.length > 0 && course.tags.slice(0, 3).map((tag, index) => (
             <View 
               key={index} 
               style={[styles.tag, { backgroundColor: Colors[colorScheme ?? 'light'].tint + '20' }]}

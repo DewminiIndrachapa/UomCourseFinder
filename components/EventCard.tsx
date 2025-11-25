@@ -145,7 +145,7 @@ export default function EventCard({ event, onPress, onSaveToggle }: EventCardPro
           </View>
 
           <View style={styles.tagsContainer}>
-            {event.tags.slice(0, 2).map((tag, index) => (
+            {event.tags && event.tags.length > 0 && event.tags.slice(0, 2).map((tag, index) => (
               <View 
                 key={index} 
                 style={[styles.tag, { backgroundColor: Colors[colorScheme ?? 'light'].tint + '20' }]}

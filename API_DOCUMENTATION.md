@@ -113,41 +113,52 @@ GET /subjects/computer_science.json?limit=2
 
 ## 🎪 Events Data API
 
-### DummyJSON Products API
-**Base URL:** `https://dummyjson.com`
-**Documentation:** https://dummyjson.com/docs/products
+### Open Library Search API
+**Base URL:** `https://openlibrary.org`
+**Documentation:** https://openlibrary.org/dev/docs/api/search
 
-#### Get Products
+#### Search Books
 ```http
-GET /products?limit=8
+GET /search.json?q={topic}&limit=1
+```
+
+**Example:**
+```http
+GET /search.json?q=artificial%20intelligence&limit=1
 ```
 
 **Response:**
 ```json
 {
-  "products": [
+  "docs": [
     {
-      "id": 1,
-      "title": "iPhone 12 Pro",
-      "description": "Latest smartphone with advanced features...",
-      "brand": "Apple",
-      "thumbnail": "https://cdn.dummyjson.com/products/images/1/thumbnail.jpg",
-      "stock": 50,
-      "tags": ["smartphones", "technology"]
+      "title": "Artificial Intelligence: A Modern Approach",
+      "author_name": ["Stuart Russell", "Peter Norvig"],
+      "cover_i": 8739161,
+      "first_publish_year": 1995,
+      "subject": ["Artificial intelligence", "Machine learning"]
     }
   ]
 }
 ```
 
+**Topics Used:**
+- `artificial intelligence`
+- `web development`
+- `data science`
+- `mobile programming`
+- `cybersecurity`
+- `machine learning`
+- `software engineering`
+- `cloud computing`
+
 **Mapped to App Events:**
-- `title` + " Workshop" → Event name
-- `description` → Event description
-- `brand` → Speaker/presenter name
-- `thumbnail` → Event image
-- `stock * 1.5` → Current attendees
-- `stock * 2` → Maximum capacity
-- `tags` → Event tags
-- Generated: Date (1-60 days in future), Time (9:00 AM - 4:00 PM), Location (Main Hall, Lab A, Conference Room, Auditorium)
+- `topic` → Event title + type (Workshop/Seminar/Conference/Webinar)
+- Book `title` → Event theme
+- `cover_i` → Event thumbnail (`https://covers.openlibrary.org/b/id/{cover_i}-L.jpg`)
+- Generated: Date (1-60 days in future), Time (9 AM - 3 PM), Location (Main Auditorium, Computer Lab, Online, etc.)
+- Generated: Capacity (50-150), Registered count, Description
+- `subject` → Event tags
 
 ---
 
@@ -161,7 +172,7 @@ GET /products?limit=8
 // Fetch courses from Open Library
 fetchCoursesFromAPI(): Promise<Course[]>
 
-// Fetch events from DummyJSON Products
+// Fetch events from Open Library Search
 fetchEventsFromAPI(): Promise<Event[]>
 
 // Fetch user profile
@@ -169,10 +180,14 @@ fetchUserProfile(userId: string): Promise<any>
 
 // Fetch demo users
 fetchDemoUsers(): Promise<any[]>
+
+// Get fallback events
+private getFallbackEvents(): Event[]
 ```
 
 **Features:**
-- ✅ Real-time API data fetching
+- ✅ Real-time API data fetching from Open Library
+- ✅ Education-focused events (AI, Web Dev, Data Science, etc.)
 - ✅ Error handling with try-catch
 - ✅ Data transformation from API format to app models
 - ✅ Automatic fallback on failure
@@ -309,7 +324,7 @@ clearCache(): Promise<void>
               │ Open Library API    │◄─── GET /subjects/{category}.json
               │ (Courses)           │
               ├─────────────────────┤
-              │ DummyJSON API       │◄─── GET /products?limit=8
+              │ Open Library API    │◄─── GET /search.json?q={topic}
               │ (Events)            │
               └──────────┬──────────┘
                          │
@@ -373,7 +388,7 @@ curl "https://openlibrary.org/subjects/computer_science.json?limit=5"
 
 **Test Events Data:**
 ```bash
-curl "https://dummyjson.com/products?limit=8"
+curl "https://openlibrary.org/search.json?q=artificial%20intelligence&limit=1"
 ```
 
 ---
@@ -386,7 +401,7 @@ curl "https://dummyjson.com/products?limit=8"
 | **Register** | DummyJSON Users | Session | Local Storage | ✅ |
 | **Demo Users** | DummyJSON Users | Initial Load | Hardcoded | ✅ |
 | **Courses** | Open Library | 24 hours | Static Data | ✅ |
-| **Events** | DummyJSON Products | 24 hours | Static Data | ✅ |
+| **Events** | Open Library Search | 24 hours | Static Data | ✅ |
 | **Bookmarks** | AsyncStorage | ∞ | None | ✅ |
 | **User Session** | AsyncStorage | Until Logout | None | ✅ |
 
@@ -398,10 +413,10 @@ curl "https://dummyjson.com/products?limit=8"
    → DummyJSON Auth API (https://dummyjson.com)
 
 ✅ **Use dummy APIs for data fetching**  
-   → Open Library API + DummyJSON Products API
+   → Open Library API (Subjects + Search)
 
 ✅ **Public APIs per domain (Education)**  
-   → Open Library API (https://openlibrary.org)
+   → Open Library API (https://openlibrary.org) - Fully education-focused
 
 ✅ **Proper error handling**  
    → Try-catch blocks with fallbacks in all API calls
@@ -427,7 +442,7 @@ npx expo start
 **On First Launch:**
 1. ✅ App fetches 5 demo users from DummyJSON
 2. ✅ Courses loaded from Open Library API (6 subjects)
-3. ✅ Events loaded from DummyJSON Products API (8 products)
+3. ✅ Events loaded from Open Library Search API (8 tech topics)
 4. ✅ All data cached for 24 hours
 5. ✅ Console logs show API fetch status
 
@@ -436,7 +451,7 @@ npx expo start
 ✅ Demo users initialized from DummyJSON API
 🌐 Fetching courses from Open Library API...
 ✅ Courses cached successfully
-🌐 Fetching events from DummyJSON API...
+🌐 Fetching events from Open Library API...
 ✅ Events cached successfully
 ```
 
@@ -488,8 +503,8 @@ const subjects = [
 
 The app successfully integrates:
 1. **DummyJSON** for user authentication (login/register)
-2. **Open Library** for educational courses data
-3. **DummyJSON Products** for campus events data
+2. **Open Library Subjects API** for educational courses data
+3. **Open Library Search API** for education-relevant events (AI, Web Dev, Data Science, etc.)
 4. **24-hour caching** for performance
 5. **Offline support** via AsyncStorage
 6. **Fallback mechanisms** for reliability
