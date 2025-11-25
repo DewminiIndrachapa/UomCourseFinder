@@ -4,10 +4,17 @@ import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { Colors } from '@/constants/theme';
+import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Text, View } from 'react-native';
 
 export default function TabLayout() {
   const { colorScheme } = useTheme();
+  const { user } = useAuth();
+
+  const getFirstName = (name: string) => {
+    return name.split(' ')[0];
+  };
 
   return (
     <Tabs
@@ -31,7 +38,17 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          headerTitle: 'Home',
+          headerTitle: () => (
+            <View>
+              <Text style={{ 
+                fontSize: 20, 
+                fontWeight: '700', 
+                color: Colors[colorScheme ?? 'light'].text 
+              }}>
+                Hi, {user?.name ? getFirstName(user.name) : 'Student'}! 👋
+              </Text>
+            </View>
+          ),
           tabBarIcon: ({ color, focused }) => (
             <Feather name="home" size={24} color={color} />
           ),

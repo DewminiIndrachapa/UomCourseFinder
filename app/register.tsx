@@ -279,7 +279,10 @@ export default function RegisterScreen() {
               {errors.faculty && <Text style={styles.errorText}>{errors.faculty}</Text>}
               
               {showFacultyPicker && (
-                <View style={[styles.picker, { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground }]}>
+                <ScrollView 
+                  style={[styles.picker, { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground }]}
+                  nestedScrollEnabled={true}
+                >
                   {FACULTIES.map((faculty) => (
                     <TouchableOpacity
                       key={faculty}
@@ -294,7 +297,7 @@ export default function RegisterScreen() {
                       </Text>
                     </TouchableOpacity>
                   ))}
-                </View>
+                </ScrollView>
               )}
             </View>
 
@@ -333,7 +336,10 @@ export default function RegisterScreen() {
               {errors.year && <Text style={styles.errorText}>{errors.year}</Text>}
               
               {showYearPicker && (
-                <View style={[styles.picker, { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground }]}>
+                <ScrollView 
+                  style={[styles.picker, { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground }]}
+                  nestedScrollEnabled={true}
+                >
                   {YEARS.map((year) => (
                     <TouchableOpacity
                       key={year}
@@ -348,7 +354,7 @@ export default function RegisterScreen() {
                       </Text>
                     </TouchableOpacity>
                   ))}
-                </View>
+                </ScrollView>
               )}
             </View>
 
