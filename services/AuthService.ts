@@ -5,7 +5,48 @@ import ApiService from './ApiService';
 
 const AUTH_KEY = '@auth_user';
 const USERS_KEY = '@registered_users';
+const PASSWORDS_KEY = '@user_passwords';
 const API_BASE_URL = 'https://dummyjson.com';
+
+// Simple hash for demo (use bcrypt in production)
+const hashPassword = (password: string): string => {
+  return btoa(password);
+};
+
+// Store password hash
+const storePasswordHash = async (userId: string, password: string): Promise<void> => {
+  try {
+    const passwordsJson = await AsyncStorage.getItem(PASSWORDS_KEY);
+    const passwords = passwordsJson ? JSON.parse(passwordsJson) : {};
+    passwords[userId] = hashPassword(password);
+    await AsyncStorage.setItem(PASSWORDS_KEY, JSON.stringify(passwords));
+  } catch (error) {
+    console.error('Error storing password:', error);
+  }
+};
+
+// Verify password
+const verifyPassword = async (userId: string, password: string): Promise<boolean> => {
+  try {
+    const passwordsJson = await AsyncStorage.getItem(PASSWORDS_KEY);
+    if (!passwordsJson) {
+      console.log('⚠️ No passwords stored yet - this might be a fresh install');
+      return false;
+    }
+    const passwords = JSON.parse(passwordsJson);
+    
+    // If user has no stored password, they need to re-register
+    if (!passwords[userId]) {
+      console.log('⚠️ No password hash found for user:', userId);
+      return false;
+    }
+    
+    return passwords[userId] === hashPassword(password);
+  } catch (error) {
+    console.error('Error verifying password:', error);
+    return false;
+  }
+};
 
 export class AuthService {
   // Get current user
@@ -74,11 +115,25 @@ export class AuthService {
       const users: User[] = usersJson ? JSON.parse(usersJson) : [];
 
       const user = users.find(
-        u => u.email.toLowerCase() === credentials.email.toLowerCase() && 
-        u.id === credentials.password // Using id as password for demo
+        u => u.email.toLowerCase() === credentials.email.toLowerCase()
       );
 
       if (!user) {
+        return { success: false, error: 'Invalid email or password' };
+      }
+
+      // Try new password verification method
+      let isPasswordValid = await verifyPassword(user.id, credentials.password);
+      
+      // Fallback: Check if this is an old user (id === password)
+      if (!isPasswordValid && user.id === credentials.password) {
+        console.log('⚠️ Migrating old user to new password system');
+        // Migrate old user to new password system
+        await storePasswordHash(user.id, credentials.password);
+        isPasswordValid = true;
+      }
+
+      if (!isPasswordValid) {
         return { success: false, error: 'Invalid email or password' };
       }
 
@@ -124,8 +179,9 @@ export class AuthService {
           createdAt: new Date().toISOString(),
         };
 
-        // Save to local storage as well
+        // Save to local storage with password hash
         await this.saveUserLocally(user);
+        await storePasswordHash(user.id, data.password);
         await SecureStorage.saveUser(user);
 
         console.log('✅ Registration successful via DummyJSON API');
@@ -159,7 +215,7 @@ export class AuthService {
       }
 
       const newUser: User = {
-        id: data.password, // Using password as id for demo
+        id: Date.now().toString(), // Generate unique ID
         name: data.name,
         email: data.email,
         studentId: data.studentId,
@@ -170,6 +226,7 @@ export class AuthService {
 
       users.push(newUser);
       await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
+      await storePasswordHash(newUser.id, data.password);
       await SecureStorage.saveUser(newUser);
 
       console.log('✅ Registration successful via local storage');

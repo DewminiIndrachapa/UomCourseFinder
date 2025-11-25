@@ -2,6 +2,7 @@ import { Colors } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Feather } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -71,6 +72,28 @@ export default function LoginScreen() {
       // Also show alert
       Alert.alert('Login Failed', errorMessage);
     }
+  };
+
+  const handleClearData = async () => {
+    Alert.alert(
+      'Clear App Data',
+      'This will delete all users and passwords. You will need to register again. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.multiRemove(['@registered_users', '@user_passwords']);
+              Alert.alert('Success', 'App data cleared. Please register again.');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear data');
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -244,6 +267,16 @@ export default function LoginScreen() {
                 Password: demo123
               </Text>
             </View>
+
+            {/* Debug: Clear Data Button */}
+            <TouchableOpacity 
+              style={styles.clearDataButton}
+              onPress={handleClearData}
+            >
+              <Text style={styles.clearDataText}>
+                🗑️ Clear App Data (Debug)
+              </Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -394,5 +427,17 @@ const styles = StyleSheet.create({
   demoText: {
     fontSize: 12,
     marginTop: 2,
+  },
+  clearDataButton: {
+    marginTop: 20,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    alignItems: 'center',
+  },
+  clearDataText: {
+    fontSize: 12,
+    color: '#FF3B30',
+    fontWeight: '600',
   },
 });
