@@ -6,8 +6,9 @@ import { DataService } from '@/services/DataService';
 import { Course, Event } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     SafeAreaView,
     ScrollView,
     StatusBar,
@@ -24,18 +25,54 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'courses' | 'events'>('courses');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
 
-  const allCourses = DataService.getCourses();
-  const allEvents = DataService.getEvents();
+  // Load data from API
+  useEffect(() => {
+    loadData();
+  }, [refreshKey]);
 
-  // Filter based on search
-  const filteredCourses = searchQuery
-    ? DataService.searchContent(searchQuery).courses
-    : allCourses;
+  // Update filtered data when search changes
+  useEffect(() => {
+    if (searchQuery) {
+      searchData();
+    } else {
+      setFilteredCourses(allCourses);
+      setFilteredEvents(allEvents);
+    }
+  }, [searchQuery, allCourses, allEvents]);
 
-  const filteredEvents = searchQuery
-    ? DataService.searchContent(searchQuery).events
-    : allEvents;
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [courses, events] = await Promise.all([
+        DataService.getCourses(),
+        DataService.getEvents(),
+      ]);
+      setAllCourses(courses);
+      setAllEvents(events);
+      setFilteredCourses(courses);
+      setFilteredEvents(events);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchData = async () => {
+    try {
+      const results = await DataService.searchContent(searchQuery);
+      setFilteredCourses(results.courses);
+      setFilteredEvents(results.events);
+    } catch (error) {
+      console.error('Error searching:', error);
+    }
+  };
 
   const handleCoursePress = (course: Course) => {
     router.push({
@@ -51,9 +88,25 @@ export default function HomeScreen() {
     });
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
+    await DataService.clearCache();
     setRefreshKey(prev => prev + 1);
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}
+      >
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors[colorScheme ?? 'light'].tint} />
+          <Text style={[styles.loadingText, { color: Colors[colorScheme ?? 'light'].text }]}>
+            Loading courses and events...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -221,6 +274,16 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 8,
   },
   header: {
     flexDirection: 'row',

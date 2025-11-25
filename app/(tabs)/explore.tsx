@@ -1,23 +1,24 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import { CATEGORIES } from '@/constants/data';
-import { DataService } from '@/services/DataService';
 import CategoryCard from '@/components/CategoryCard';
 import CourseCard from '@/components/CourseCard';
 import EventCard from '@/components/EventCard';
+import { CATEGORIES } from '@/constants/data';
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { DataService } from '@/services/DataService';
 import { Course, Event } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 export default function ExploreScreen() {
   const colorScheme = useColorScheme();
@@ -25,17 +26,46 @@ export default function ExploreScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'courses' | 'events'>('courses');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [displayCourses, setDisplayCourses] = useState<Course[]>([]);
+  const [displayEvents, setDisplayEvents] = useState<Event[]>([]);
 
-  const allCourses = DataService.getCourses();
-  const allEvents = DataService.getEvents();
+  useEffect(() => {
+    loadData();
+  }, [refreshKey]);
 
-  // Filter by selected category
-  const filteredContent = selectedCategory
-    ? DataService.filterByCategory(selectedCategory)
-    : { courses: allCourses, events: allEvents };
+  useEffect(() => {
+    filterByCategory();
+  }, [selectedCategory, allCourses, allEvents]);
 
-  const displayCourses = filteredContent.courses;
-  const displayEvents = filteredContent.events;
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [courses, events] = await Promise.all([
+        DataService.getCourses(),
+        DataService.getEvents(),
+      ]);
+      setAllCourses(courses);
+      setAllEvents(events);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterByCategory = async () => {
+    if (selectedCategory) {
+      const filtered = await DataService.filterByCategory(selectedCategory);
+      setDisplayCourses(filtered.courses);
+      setDisplayEvents(filtered.events);
+    } else {
+      setDisplayCourses(allCourses);
+      setDisplayEvents(allEvents);
+    }
+  };
 
   const handleCategoryPress = (categoryName: string) => {
     if (selectedCategory === categoryName) {
@@ -59,9 +89,25 @@ export default function ExploreScreen() {
     });
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
+    await DataService.clearCache();
     setRefreshKey(prev => prev + 1);
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}
+      >
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors[colorScheme ?? 'light'].tint} />
+          <Text style={[styles.loadingText, { color: Colors[colorScheme ?? 'light'].text }]}>
+            Loading content...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -249,6 +295,16 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 8,
   },
   header: {
     paddingHorizontal: 20,
