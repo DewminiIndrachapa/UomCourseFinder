@@ -1,112 +1,336 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  StatusBar,
+  TouchableOpacity,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/theme';
+import { CATEGORIES } from '@/constants/data';
+import { DataService } from '@/services/DataService';
+import CategoryCard from '@/components/CategoryCard';
+import CourseCard from '@/components/CourseCard';
+import EventCard from '@/components/EventCard';
+import { Course, Event } from '@/types';
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+export default function ExploreScreen() {
+  const colorScheme = useColorScheme();
+  const router = useRouter();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'courses' | 'events'>('courses');
+  const [refreshKey, setRefreshKey] = useState(0);
 
-export default function TabTwoScreen() {
+  const allCourses = DataService.getCourses();
+  const allEvents = DataService.getEvents();
+
+  // Filter by selected category
+  const filteredContent = selectedCategory
+    ? DataService.filterByCategory(selectedCategory)
+    : { courses: allCourses, events: allEvents };
+
+  const displayCourses = filteredContent.courses;
+  const displayEvents = filteredContent.events;
+
+  const handleCategoryPress = (categoryName: string) => {
+    if (selectedCategory === categoryName) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(categoryName);
+    }
+  };
+
+  const handleCoursePress = (course: Course) => {
+    router.push({
+      pathname: '/modal',
+      params: { id: course.id, type: 'course' },
+    });
+  };
+
+  const handleEventPress = (event: Event) => {
+    router.push({
+      pathname: '/modal',
+      params: { id: event.id, type: 'event' },
+    });
+  };
+
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}
+    >
+      <StatusBar
+        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={Colors[colorScheme ?? 'light'].background}
+      />
+
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
           Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+        </Text>
+        <Text style={[styles.subtitle, { color: Colors[colorScheme ?? 'light'].tabIconDefault }]}>
+          Browse by category
+        </Text>
+      </View>
+
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Categories */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: Colors[colorScheme ?? 'light'].text }]}>
+            Categories
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesContainer}
+          >
+            {CATEGORIES.map((category) => (
+              <TouchableOpacity
+                key={category.id}
+                onPress={() => handleCategoryPress(category.name)}
+              >
+                <View
+                  style={[
+                    selectedCategory === category.name && styles.selectedCategoryWrapper,
+                  ]}
+                >
+                  <CategoryCard
+                    category={category}
+                    onPress={() => handleCategoryPress(category.name)}
+                  />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Selected Category Indicator */}
+        {selectedCategory && (
+          <View style={styles.filterBadge}>
+            <Text style={[styles.filterText, { color: Colors[colorScheme ?? 'light'].text }]}>
+              Filtered by: {selectedCategory}
+            </Text>
+            <TouchableOpacity onPress={() => setSelectedCategory(null)}>
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color={Colors[colorScheme ?? 'light'].tint}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Tab Selector */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[
+              styles.tab,
+              activeTab === 'courses' && styles.activeTab,
+              activeTab === 'courses' && { borderBottomColor: Colors[colorScheme ?? 'light'].tint },
+            ]}
+            onPress={() => setActiveTab('courses')}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                { color: Colors[colorScheme ?? 'light'].tabIconDefault },
+                activeTab === 'courses' && {
+                  color: Colors[colorScheme ?? 'light'].tint,
+                  fontWeight: '700',
+                },
+              ]}
+            >
+              Courses ({displayCourses.length})
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.tab,
+              activeTab === 'events' && styles.activeTab,
+              activeTab === 'events' && { borderBottomColor: Colors[colorScheme ?? 'light'].tint },
+            ]}
+            onPress={() => setActiveTab('events')}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                { color: Colors[colorScheme ?? 'light'].tabIconDefault },
+                activeTab === 'events' && {
+                  color: Colors[colorScheme ?? 'light'].tint,
+                  fontWeight: '700',
+                },
+              ]}
+            >
+              Events ({displayEvents.length})
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Content List */}
+        <View style={styles.listContainer}>
+          {activeTab === 'courses' ? (
+            displayCourses.length > 0 ? (
+              displayCourses.map((course) => (
+                <CourseCard
+                  key={course.id + refreshKey}
+                  course={course}
+                  onPress={() => handleCoursePress(course)}
+                  onSaveToggle={handleRefresh}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Ionicons
+                  name="school-outline"
+                  size={64}
+                  color={Colors[colorScheme ?? 'light'].tabIconDefault}
+                />
+                <Text style={[styles.emptyText, { color: Colors[colorScheme ?? 'light'].text }]}>
+                  No courses found
+                </Text>
+                <Text
+                  style={[
+                    styles.emptySubtext,
+                    { color: Colors[colorScheme ?? 'light'].tabIconDefault },
+                  ]}
+                >
+                  Try selecting a different category
+                </Text>
+              </View>
+            )
+          ) : displayEvents.length > 0 ? (
+            displayEvents.map((event) => (
+              <EventCard
+                key={event.id + refreshKey}
+                event={event}
+                onPress={() => handleEventPress(event)}
+                onSaveToggle={handleRefresh}
+              />
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <Ionicons
+                name="calendar-outline"
+                size={64}
+                color={Colors[colorScheme ?? 'light'].tabIconDefault}
+              />
+              <Text style={[styles.emptyText, { color: Colors[colorScheme ?? 'light'].text }]}>
+                No events found
+              </Text>
+              <Text
+                style={[
+                  styles.emptySubtext,
+                  { color: Colors[colorScheme ?? 'light'].tabIconDefault },
+                ]}
+              >
+                Try selecting a different category
+              </Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
   },
-  titleContainer: {
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 16,
+  },
+  content: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 20,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  categoriesContainer: {
+    paddingHorizontal: 20,
+  },
+  selectedCategoryWrapper: {
+    transform: [{ scale: 0.95 }],
+    opacity: 0.7,
+  },
+  filterBadge: {
     flexDirection: 'row',
-    gap: 8,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    marginBottom: 16,
+  },
+  filterText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E1E8ED',
+    marginBottom: 16,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+  },
+  tabText: {
+    fontSize: 16,
+  },
+  listContainer: {
+    paddingHorizontal: 20,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 16,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
