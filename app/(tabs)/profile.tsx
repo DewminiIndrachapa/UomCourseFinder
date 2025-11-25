@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import {
     Alert,
@@ -9,13 +9,14 @@ import {
     ScrollView,
     StatusBar,
     StyleSheet,
+    Switch,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 export default function ProfileScreen() {
-  const colorScheme = useColorScheme();
+  const { colorScheme, toggleTheme, isDarkMode } = useTheme();
   const { user, logout } = useAuth();
 
   const handleLogout = () => {
@@ -62,13 +63,6 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
-            Profile
-          </Text>
-        </View>
-
         {/* Profile Card */}
         <View
           style={[
@@ -112,8 +106,8 @@ export default function ProfileScreen() {
           >
             <View style={styles.detailRow}>
               <View style={styles.detailIcon}>
-                <Ionicons
-                  name="business-outline"
+                <Feather
+                  name="briefcase"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tint}
                 />
@@ -132,8 +126,8 @@ export default function ProfileScreen() {
 
             <View style={styles.detailRow}>
               <View style={styles.detailIcon}>
-                <Ionicons
-                  name="calendar-outline"
+                <Feather
+                  name="calendar"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tint}
                 />
@@ -152,8 +146,8 @@ export default function ProfileScreen() {
 
             <View style={styles.detailRow}>
               <View style={styles.detailIcon}>
-                <Ionicons
-                  name="time-outline"
+                <Feather
+                  name="clock"
                   size={20}
                   color={Colors[colorScheme ?? 'light'].tint}
                 />
@@ -179,6 +173,45 @@ export default function ProfileScreen() {
             Settings
           </Text>
 
+          {/* Dark Mode Toggle */}
+          <View
+            style={[
+              styles.actionCard,
+              { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground },
+            ]}
+          >
+            <View style={styles.actionContent}>
+              <View style={styles.actionLeft}>
+                <View
+                  style={[
+                    styles.iconContainer,
+                    { backgroundColor: isDarkMode ? '#4A5568' : '#FDB241' },
+                  ]}
+                >
+                  <Feather
+                    name={isDarkMode ? 'moon' : 'sun'}
+                    size={20}
+                    color="#fff"
+                  />
+                </View>
+                <View style={styles.actionTextContainer}>
+                  <Text style={[styles.actionTitle, { color: Colors[colorScheme ?? 'light'].text }]}>
+                    Dark Mode
+                  </Text>
+                  <Text style={[styles.actionSubtitle, { color: Colors[colorScheme ?? 'light'].tabIconDefault }]}>
+                    {isDarkMode ? 'Enabled' : 'Disabled'}
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={isDarkMode}
+                onValueChange={toggleTheme}
+                trackColor={{ false: '#767577', true: Colors[colorScheme ?? 'light'].tint }}
+                thumbColor="#fff"
+              />
+            </View>
+          </View>
+
           <TouchableOpacity
             style={[
               styles.actionCard,
@@ -187,8 +220,8 @@ export default function ProfileScreen() {
             onPress={() => Alert.alert('Coming Soon', 'This feature is under development')}
           >
             <View style={styles.actionIcon}>
-              <Ionicons
-                name="notifications-outline"
+              <Feather
+                name="bell"
                 size={22}
                 color={Colors[colorScheme ?? 'light'].tint}
               />
@@ -196,8 +229,8 @@ export default function ProfileScreen() {
             <Text style={[styles.actionText, { color: Colors[colorScheme ?? 'light'].text }]}>
               Notifications
             </Text>
-            <Ionicons
-              name="chevron-forward"
+            <Feather
+              name="chevron-right"
               size={20}
               color={Colors[colorScheme ?? 'light'].tabIconDefault}
             />
@@ -211,8 +244,8 @@ export default function ProfileScreen() {
             onPress={() => Alert.alert('Coming Soon', 'This feature is under development')}
           >
             <View style={styles.actionIcon}>
-              <Ionicons
-                name="lock-closed-outline"
+              <Feather
+                name="lock"
                 size={22}
                 color={Colors[colorScheme ?? 'light'].tint}
               />
@@ -220,8 +253,8 @@ export default function ProfileScreen() {
             <Text style={[styles.actionText, { color: Colors[colorScheme ?? 'light'].text }]}>
               Privacy & Security
             </Text>
-            <Ionicons
-              name="chevron-forward"
+            <Feather
+              name="chevron-right"
               size={20}
               color={Colors[colorScheme ?? 'light'].tabIconDefault}
             />
@@ -235,8 +268,8 @@ export default function ProfileScreen() {
             onPress={() => Alert.alert('Coming Soon', 'This feature is under development')}
           >
             <View style={styles.actionIcon}>
-              <Ionicons
-                name="help-circle-outline"
+              <Feather
+                name="help-circle"
                 size={22}
                 color={Colors[colorScheme ?? 'light'].tint}
               />
@@ -244,8 +277,8 @@ export default function ProfileScreen() {
             <Text style={[styles.actionText, { color: Colors[colorScheme ?? 'light'].text }]}>
               Help & Support
             </Text>
-            <Ionicons
-              name="chevron-forward"
+            <Feather
+              name="chevron-right"
               size={20}
               color={Colors[colorScheme ?? 'light'].tabIconDefault}
             />
@@ -259,8 +292,8 @@ export default function ProfileScreen() {
             onPress={() => Alert.alert('Coming Soon', 'This feature is under development')}
           >
             <View style={styles.actionIcon}>
-              <Ionicons
-                name="information-circle-outline"
+              <Feather
+                name="info"
                 size={22}
                 color={Colors[colorScheme ?? 'light'].tint}
               />
@@ -268,8 +301,8 @@ export default function ProfileScreen() {
             <Text style={[styles.actionText, { color: Colors[colorScheme ?? 'light'].text }]}>
               About
             </Text>
-            <Ionicons
-              name="chevron-forward"
+            <Feather
+              name="chevron-right"
               size={20}
               color={Colors[colorScheme ?? 'light'].tabIconDefault}
             />
@@ -281,7 +314,7 @@ export default function ProfileScreen() {
           style={[styles.logoutButton, { backgroundColor: '#E74C3C' }]}
           onPress={handleLogout}
         >
-          <Ionicons name="log-out-outline" size={20} color="#fff" />
+          <Feather name="log-out" size={20} color="#fff" />
           <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
 
@@ -391,8 +424,6 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   actionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -401,6 +432,35 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+  },
+  actionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  actionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  actionTextContainer: {
+    flex: 1,
+  },
+  actionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  actionSubtitle: {
+    fontSize: 12,
   },
   actionIcon: {
     marginRight: 16,

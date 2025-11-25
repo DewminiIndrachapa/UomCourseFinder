@@ -31,7 +31,7 @@ export class DataService {
         if (cachedCourses) {
           this.coursesCache = JSON.parse(cachedCourses);
           console.log('✅ Loaded courses from cache');
-          return this.coursesCache;
+          return this.coursesCache || [];
         }
       }
 
@@ -72,7 +72,7 @@ export class DataService {
         if (cachedEvents) {
           this.eventsCache = JSON.parse(cachedEvents);
           console.log('✅ Loaded events from cache');
-          return this.eventsCache;
+          return this.eventsCache || [];
         }
       }
 
@@ -134,7 +134,7 @@ export class DataService {
     const allEvents = await this.getEvents();
     
     const courses = allCourses.filter(course => course.category === category);
-    const events = allEvents.filter(event => event.type === category.toLowerCase());
+    const events = allEvents.filter(event => event.category === category);
     return { courses, events };
   }
 

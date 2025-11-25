@@ -3,16 +3,19 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ThemeProvider as CustomThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { persistor, store } from '@/store';
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
@@ -46,8 +49,14 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootLayoutNav />
-    </AuthProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <CustomThemeProvider>
+          <AuthProvider>
+            <RootLayoutNav />
+          </AuthProvider>
+        </CustomThemeProvider>
+      </PersistGate>
+    </Provider>
   );
 }

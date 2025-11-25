@@ -3,10 +3,10 @@ import CourseCard from '@/components/CourseCard';
 import EventCard from '@/components/EventCard';
 import { CATEGORIES } from '@/constants/data';
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { DataService } from '@/services/DataService';
 import { Course, Event } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -21,7 +21,7 @@ import {
 } from 'react-native';
 
 export default function ExploreScreen() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'courses' | 'events'>('courses');
@@ -118,15 +118,6 @@ export default function ExploreScreen() {
         backgroundColor={Colors[colorScheme ?? 'light'].background}
       />
 
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
-          Explore
-        </Text>
-        <Text style={[styles.subtitle, { color: Colors[colorScheme ?? 'light'].tabIconDefault }]}>
-          Browse by category
-        </Text>
-      </View>
-
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
@@ -169,8 +160,8 @@ export default function ExploreScreen() {
               Filtered by: {selectedCategory}
             </Text>
             <TouchableOpacity onPress={() => setSelectedCategory(null)}>
-              <Ionicons
-                name="close-circle"
+              <Feather
+                name="x-circle"
                 size={20}
                 color={Colors[colorScheme ?? 'light'].tint}
               />
@@ -239,8 +230,8 @@ export default function ExploreScreen() {
               ))
             ) : (
               <View style={styles.emptyState}>
-                <Ionicons
-                  name="school-outline"
+                <Feather
+                  name="book"
                   size={64}
                   color={Colors[colorScheme ?? 'light'].tabIconDefault}
                 />
@@ -268,8 +259,8 @@ export default function ExploreScreen() {
             ))
           ) : (
             <View style={styles.emptyState}>
-              <Ionicons
-                name="calendar-outline"
+              <Feather
+                name="calendar"
                 size={64}
                 color={Colors[colorScheme ?? 'light'].tabIconDefault}
               />

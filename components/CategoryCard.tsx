@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Category } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -11,7 +11,7 @@ interface CategoryCardProps {
 }
 
 export default function CategoryCard({ category, onPress }: CategoryCardProps) {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
 
   return (
     <TouchableOpacity 
@@ -23,7 +23,7 @@ export default function CategoryCard({ category, onPress }: CategoryCardProps) {
       activeOpacity={0.7}
     >
       <View style={[styles.iconContainer, { backgroundColor: category.color + '20' }]}>
-        <Ionicons 
+        <Feather 
           name={category.icon as any} 
           size={32} 
           color={category.color} 

@@ -1,10 +1,10 @@
 import CourseCard from '@/components/CourseCard';
 import EventCard from '@/components/EventCard';
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { DataService } from '@/services/DataService';
 import { Course, Event } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 
 export default function HomeScreen() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'courses' | 'events'>('courses');
@@ -116,17 +116,6 @@ export default function HomeScreen() {
         barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={Colors[colorScheme ?? 'light'].background}
       />
-      
-      <View style={styles.header}>
-        <View>
-          <Text style={[styles.greeting, { color: Colors[colorScheme ?? 'light'].tabIconDefault }]}>
-            Welcome back!
-          </Text>
-          <Text style={[styles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
-            UoM Course Finder
-          </Text>
-        </View>
-      </View>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -135,8 +124,8 @@ export default function HomeScreen() {
             styles.searchBar,
             { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground },
           ]}
-        >
-          <Ionicons
+          >
+          <Feather
             name="search"
             size={20}
             color={Colors[colorScheme ?? 'light'].tabIconDefault}
@@ -150,8 +139,8 @@ export default function HomeScreen() {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons
-                name="close-circle"
+              <Feather
+                name="x-circle"
                 size={20}
                 color={Colors[colorScheme ?? 'light'].tabIconDefault}
               />
@@ -225,8 +214,8 @@ export default function HomeScreen() {
             ))
           ) : (
             <View style={styles.emptyState}>
-              <Ionicons
-                name="school-outline"
+              <Feather
+                name="book"
                 size={64}
                 color={Colors[colorScheme ?? 'light'].tabIconDefault}
               />
@@ -251,8 +240,8 @@ export default function HomeScreen() {
           ))
         ) : (
           <View style={styles.emptyState}>
-            <Ionicons
-              name="calendar-outline"
+            <Feather
+              name="calendar"
               size={64}
               color={Colors[colorScheme ?? 'light'].tabIconDefault}
             />

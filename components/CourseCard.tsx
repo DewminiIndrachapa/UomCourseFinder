@@ -1,8 +1,8 @@
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { DataService } from '@/services/DataService';
 import { Course } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -13,7 +13,7 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course, onPress, onSaveToggle }: CourseCardProps) {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
@@ -72,10 +72,11 @@ export default function CourseCard({ course, onPress, onSaveToggle }: CourseCard
             {course.title}
           </Text>
           <TouchableOpacity onPress={handleSaveToggle} style={styles.saveButton}>
-            <Ionicons
-              name={isSaved ? 'bookmark' : 'bookmark-outline'}
+            <Feather
+              name="bookmark"
               size={24}
               color={isSaved ? '#4A90E2' : Colors[colorScheme ?? 'light'].icon}
+              fill={isSaved ? '#4A90E2' : 'none'}
             />
           </TouchableOpacity>
         </View>
@@ -100,7 +101,7 @@ export default function CourseCard({ course, onPress, onSaveToggle }: CourseCard
               <Text style={styles.levelText}>{course.level}</Text>
             </View>
             <View style={styles.ratingContainer}>
-              <Ionicons name="star" size={16} color="#F39C12" />
+              <Feather name="star" size={16} color="#F39C12" fill="#F39C12" />
               <Text style={[styles.rating, { color: Colors[colorScheme ?? 'light'].text }]}>
                 {course.rating}
               </Text>
@@ -108,8 +109,8 @@ export default function CourseCard({ course, onPress, onSaveToggle }: CourseCard
           </View>
           
           <View style={styles.metaContainer}>
-            <Ionicons 
-              name="time-outline" 
+            <Feather 
+              name="clock" 
               size={14} 
               color={Colors[colorScheme ?? 'light'].tabIconDefault} 
             />
